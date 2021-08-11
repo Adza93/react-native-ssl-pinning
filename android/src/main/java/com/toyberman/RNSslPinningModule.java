@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -52,6 +54,7 @@ public class RNSslPinningModule extends ReactContextBaseJavaModule {
     private CookieJar cookieJar = null;
     private ForwardingCookieHandler cookieHandler;
     private OkHttpClient client;
+    private String domainName = "";
 
     public RNSslPinningModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -169,7 +172,7 @@ public class RNSslPinningModule extends ReactContextBaseJavaModule {
     public void fetch(String hostname, final ReadableMap options, final Callback callback) {
 
         final WritableMap response = Arguments.createMap();
-        String domainName;
+        domainName =  "";
         try {
             domainName = getDomainName(hostname);
         } catch (URISyntaxException e) {
@@ -201,7 +204,14 @@ public class RNSslPinningModule extends ReactContextBaseJavaModule {
             client.newCall(request).enqueue(new okhttp3.Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    callback.invoke(e.getMessage());
+
+                    if(e instanceof SSLPeerUnverifiedException){
+                        callback.invoke("The certificate for this server is invalid. You might be connecting to a server that is pretending to be "+domainName+" which could put your confidential information at risk.");
+                    }
+                    else{
+                        //Other failure reasons
+                        callback.invoke(e.getMessage());
+                    }
                 }
 
                 @Override
@@ -210,7 +220,7 @@ public class RNSslPinningModule extends ReactContextBaseJavaModule {
                     String stringResponse = new String(bytes, "UTF-8");
                     String responseType = "";
 
-                    //build response headers map
+                    //build response headers maptehno
                     WritableMap headers = buildResponseHeaders(okHttpResponse);
                     //set response status code
                     response.putInt("status", okHttpResponse.code());

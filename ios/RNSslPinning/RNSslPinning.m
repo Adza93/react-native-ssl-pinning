@@ -217,7 +217,6 @@ RCT_EXPORT_METHOD(fetch:(NSString *)url obj:(NSDictionary *)obj callback:(RCTRes
     BOOL disableAllSecurity = [[obj objectForKey:@"disableAllSecurity"] boolValue];
     
     NSSet *certificates = [AFSecurityPolicy certificatesInBundle:[NSBundle mainBundle]];
-    
     // set policy (ssl pinning)
     if(disableAllSecurity){
         policy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
@@ -225,9 +224,13 @@ RCT_EXPORT_METHOD(fetch:(NSString *)url obj:(NSDictionary *)obj callback:(RCTRes
         policy.allowInvalidCertificates = true;
     }
     else if (pkPinning){
-        policy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModePublicKey withPinnedCertificates:certificates];
+        policy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModePublicKeyHash];
+        [policy setValidatesCertificateChain:NO]; // This allows to use backup key(s)
+        NSArray *certificateHashes = [[obj objectForKey:@"sslPinning"] objectForKey:@"certs"];
+        [policy setPinnedPublicKeyHashes:certificateHashes];
     }
     else{
+        //Fall back ssl pinning
         policy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate withPinnedCertificates:certificates];
     }
     
