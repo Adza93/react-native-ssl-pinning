@@ -1,5 +1,7 @@
 
-# react-native-ssl-pinning
+# react-native-ssl-pinning - forked by Adza93
+
+Main reason of making this fork is to support SHA256 pkey hash pinning on iOS platform, and to fix several issues on android platform implementation. For now those updates cannot be part of main repositories since AFNetworking team still cannot allow for simmilar change in new AFSSLPinningMode: AFSSLPinningModePublicKeyHash from back in 2015. Also, dependant module AFNetworking is also linked to my fork branch so it can support implementation.
 
 React-Native ssl pinning & public key pinning using OkHttp 3 in Android, and AFNetworking on iOS. 
 
