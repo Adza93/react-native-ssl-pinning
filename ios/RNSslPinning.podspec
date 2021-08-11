@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.dependency "React"
   #s.dependency "AFNetworking", "~> 4.0"
   #dependant on Adza93 fork due to implementation of PubliKeyPinning on iOS:AFNetworking
-  s.dependency "AFNetworking", :git => 'https://github.com/Adza93/AFNetworking.git'
+  s.dependency 'AFNetworking', '~> 4.0', :git => 'https://github.com/Adza93/AFNetworking.git'
 end
